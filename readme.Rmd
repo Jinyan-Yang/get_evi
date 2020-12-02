@@ -9,4 +9,4 @@ output: word_document
 
 The google earth engine link to modis products
 
-https://code.earthengine.google.com/e5a8a6ed04fdda7b63d1a80917509228
+https://code.earthengine.google.com/?accept_repo=users/ndvi_dn/get_ndvi
