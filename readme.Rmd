@@ -1,0 +1,12 @@
+---
+title: "Read Me"
+author: "Jinyan Yang"
+date: "03/12/2020"
+output: html_document
+---
+
+# Note
+
+The google earth engine link to modis products
+
+https://code.earthengine.google.com/e5a8a6ed04fdda7b63d1a80917509228
