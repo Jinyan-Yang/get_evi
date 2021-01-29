@@ -128,7 +128,7 @@ write.csv(rbind(samples.19,samples.21),'chosen sites.csv',row.names = F)
 
 
 #make plots
-pdf('lcm with sites.pdf',width = 8,height = 0.76*8)
+pdf('figures/lcm with sites.pdf',width = 8,height = 0.76*8)
 # 
 plot(lcm.raster)
 # adline grid lines
