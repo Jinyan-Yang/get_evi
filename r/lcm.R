@@ -39,8 +39,8 @@ lcm.raster@extent@ymin <- -44.318646
 lcm.raster@extent@ymax <- -8.139869
 # (-44.318646 +8.139869)/(109.504356-157.215737)
 # change color to make the grassland stand out
-lcm.raster@legend@colortable[1:256] <- '#FFFDD0'#A9A9A9'
-lcm.raster@legend@colortable[c(20,22)] <- col.df$flower[1:2]
+lcm.raster@legend@colortable[1:256] <- '#808080'#'#FFFDD0'
+lcm.raster@legend@colortable[20] <- lcm.original@legend@colortable[20]
 lcm.raster@legend@colortable[129] <- '#006994'
 # mask NA  with 233 so  aggregation works properly
 # lcm.raster <- calc(lcm.raster, fun=function(x){ x[x %in% 1:29 & x!=19&x!=21] <- 0; return(x)})
@@ -111,7 +111,7 @@ random.select.func <- function(tmp.df,n.band = 5,num.per.band = 2){
 # samples.21 <- random.select.func(tmp.df.21,n.band = 1,num.per.band = 5)
 
 # randomly selects a few sites
-set.seed(1935)
+set.seed(10086)
 r.nm.19 <- sample.int(length(tmp.df.19$x),10)
 r.nm.21 <- sample.int(length(tmp.df.21$x),10)
 
@@ -135,24 +135,24 @@ samples.19$lon <- samples.19$x + map.res[1]*5
 samples.19$lat <- samples.19$y + map.res[2]*5
 samples.19$x.nm <- coord2xy.func(samples.19$x,is.lat = FALSE,n.dim=lcm.original@ncols)
 samples.19$y.nm <-  coord2xy.func(samples.19$y,is.lat = TRUE,n.dim=lcm.original@nrows)
-samples.21 <- tmp.df.21[r.nm.21,]
-samples.21$lon <- samples.21$x + map.res[1]*5
-samples.21$lat <- samples.21$y + map.res[2]*5
-samples.21$x.nm <- coord2xy.func(samples.21$x,is.lat = FALSE,n.dim=lcm.original@ncols)
-samples.21$y.nm <-  coord2xy.func(samples.21$y,is.lat = TRUE,n.dim=lcm.original@nrows)
+# samples.21 <- tmp.df.21[r.nm.21,]
+# samples.21$lon <- samples.21$x + map.res[1]*5
+# samples.21$lat <- samples.21$y + map.res[2]*5
+# samples.21$x.nm <- coord2xy.func(samples.21$x,is.lat = FALSE,n.dim=lcm.original@ncols)
+# samples.21$y.nm <-  coord2xy.func(samples.21$y,is.lat = TRUE,n.dim=lcm.original@nrows)
 # save chosen sites
 write.csv(rbind(samples.19,samples.21),'chosen sites.csv',row.names = F)
 
 
 #make plots
-pdf('figures/lcm with sites.pdf',width = 8,height = 0.76*8)
+pdf('figures/lcm with sites.pdf',width = 8,height = 1*8)
 # 
 
-plot(lcm.original)
+plot(lcm.original,asp=1)
 # plot choosen sites
 points(x = samples.19$x.nm,y=samples.19$y.nm,pch=0,col='red',cex=.5)
 
-points(x = samples.21$x.nm,y=samples.21$y.nm,pch=0,col='black',cex=.5)
+# points(x = samples.21$x.nm,y=samples.21$y.nm,pch=0,col='black',cex=.5)
 
 # DN sites
 points(x = coord2xy.func(c(150.73394,144.619028,146.641889,141.712600),is.lat = FALSE,n.dim=lcm.original@ncols),
@@ -165,8 +165,8 @@ points(x = coord2xy.func(watson.sites$lon,is.lat = FALSE,n.dim=lcm.original@ncol
        y = coord2xy.func(watson.sites$lat,is.lat = TRUE,n.dim=lcm.original@nrows),
        pch=4,col=col.df$reptile[3],cex=1)
 
-legend(x=100,y=4600,legend = c('Tussock','Other','Chosen Tussock','Chosen other','DroughtNet','Watson'),
-       pch=c(15,15,0,0,3,4),col=c(lcm.original@legend@colortable[c(20,22)],'red','black',col.df$reptil[1:2]),bg='grey')
+legend(x=100,y=4500,legend = c('Tussock','Chosen Tussock','DroughtNet','Watson'),
+       pch=c(15,0,3,4),col=c(lcm.original@legend@colortable[20],'red',col.df$reptil[1:2]),bg='grey')
 
 # plot the hilighted map
 plot(lcm.raster)
@@ -182,8 +182,8 @@ abline(h = -20,lty='dashed',col='darkgrey')
 abline(h = -30,lty='dashed',col='darkgrey')
 abline(h = -40,lty='dashed',col='darkgrey')
 # plot choosen sites
-points(x = samples.21$x,y=samples.19$y,pch=0,col='black',cex=.5)
-points(x = samples.19$x,y=samples.21$y,pch=0,col='red',cex=.5)
+# points(x = samples.21$x,y=samples.21$y,pch=0,col='black',cex=.5)
+points(x = samples.19$x,y=samples.19$y,pch=0,col='red',cex=.5)
 # DN sites
 points(x = c(150.73394,144.619028,146.641889,141.712600),
        y = -c(33.610412,26.577250,31.645194,29.607250),
@@ -191,6 +191,8 @@ points(x = c(150.73394,144.619028,146.641889,141.712600),
 # Waston sites
 watson.sites <- read.csv('watson_site.csv')
 points(x = watson.sites$lon,y=watson.sites$lat,pch=4,col=col.df$reptile[3],cex=1)
+legend(x=111,y=-36.5,legend = c('Tussock','Chosen Tussock','DroughtNet','Watson'),
+       pch=c(15,0,3,4),col=c(lcm.original@legend@colortable[20],'red',col.df$reptil[1:2]),bg='grey')
 
 dev.off()
 
