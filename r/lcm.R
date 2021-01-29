@@ -27,19 +27,21 @@ devtools::source_url("https://github.com/Jinyan-Yang/colors/blob/master/R/col.R?
 # read lcm
 dpath <- 'downloads/lcm/GRID_NVIS5_1_AUST_EXT_MVG/aus5_1e_mvg.ovr'
 lcm.original <-  raster(dpath,layer=1)
-lcm.raster <- lcm.original
 
 # set lon and lat
-lcm.raster@extent@xmin <- 109.504356
-lcm.raster@extent@xmax <- 157.215737
-lcm.raster@extent@ymin <- -44.318646
-lcm.raster@extent@ymax <- -8.139869
+lcm.original@extent@xmin <- 109.504356
+lcm.original@extent@xmax <- 157.215737
+lcm.original@extent@ymin <- -44.318646
+lcm.original@extent@ymax <- -8.139869
 # (-44.318646 +8.139869)/(109.504356-157.215737)
+lcm.original@legend@colortable[129] <- '#006994'
+
+lcm.raster <- lcm.original
 
 # change color to make the grassland stand out
 lcm.raster@legend@colortable[1:256] <- '#FFFDD0'#A9A9A9'
-lcm.raster@legend@colortable[129] <- '#006994'
 lcm.raster@legend@colortable[c(20,22)] <- col.df$flower[1:2]
+lcm.raster@legend@colortable[129] <- '#006994'
 # mask NA  with 233 so  aggregation works properly
 # lcm.raster <- calc(lcm.raster, fun=function(x){ x[x %in% 1:29 & x!=19&x!=21] <- 0; return(x)})
 # range(lcm.rasterc)
@@ -130,7 +132,8 @@ write.csv(rbind(samples.19,samples.21),'chosen sites.csv',row.names = F)
 #make plots
 pdf('figures/lcm with sites.pdf',width = 8,height = 0.76*8)
 # 
-plot(lcm.raster)
+
+plot(lcm.original)
 # adline grid lines
 abline(v = 110,lty='dashed',col='darkgrey')
 abline(v = 120,lty='dashed',col='darkgrey')
@@ -153,11 +156,11 @@ points(x = c(150.73394,144.619028,146.641889,141.712600),
 watson.sites <- read.csv('watson_site.csv')
 points(x = watson.sites$lon,y=watson.sites$lat,pch=4,col=col.df$reptile[3],cex=1)
 
-legend(x=109.504356,y=-35,legend = c('Tussock','Other','Chosen Tussock','Chosen other','DroughtNet','Watson'),
-       pch=c(15,15,0,0,3,4),col=c(col.df$flower[1:2],'red','black',col.df$reptil[1:2]))
+legend(x=109.504356,y=-35.7,legend = c('Tussock','Other','Chosen Tussock','Chosen other','DroughtNet','Watson'),
+       pch=c(15,15,0,0,3,4),col=c(lcm.raster@legend@colortable[c(20,22)],'red','black',col.df$reptil[1:2]),bg='grey')
 
-# plot the original map
-plot(lcm.original)
-# legend('bottomleft',)
+# plot the hilighted map
+plot(lcm.raster)
+
 dev.off()
 
