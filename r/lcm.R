@@ -153,7 +153,7 @@ points(x = c(150.73394,144.619028,146.641889,141.712600),
 watson.sites <- read.csv('watson_site.csv')
 points(x = watson.sites$lon,y=watson.sites$lat,pch=4,col=col.df$reptile[3],cex=1)
 
-legend(x=109.504356,y=-35,legend = c('Tussock','Other','choosen Tussock','choosen other','DroughtNet','Watson'),
+legend(x=109.504356,y=-35,legend = c('Tussock','Other','Chosen Tussock','Chosen other','DroughtNet','Watson'),
        pch=c(15,15,0,0,3,4),col=c(col.df$flower[1:2],'red','black',col.df$reptil[1:2]))
 
 # plot the original map
