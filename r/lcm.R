@@ -27,17 +27,17 @@ devtools::source_url("https://github.com/Jinyan-Yang/colors/blob/master/R/col.R?
 # read lcm
 dpath <- 'downloads/lcm/GRID_NVIS5_1_AUST_EXT_MVG/aus5_1e_mvg.ovr'
 lcm.original <-  raster(dpath,layer=1)
-
-# set lon and lat
-lcm.original@extent@xmin <- 109.504356
-lcm.original@extent@xmax <- 157.215737
-lcm.original@extent@ymin <- -44.318646
-lcm.original@extent@ymax <- -8.139869
-# (-44.318646 +8.139869)/(109.504356-157.215737)
+# change ocean color
 lcm.original@legend@colortable[129] <- '#006994'
 
 lcm.raster <- lcm.original
 
+# set lon and lat
+lcm.raster@extent@xmin <- 109.504356
+lcm.raster@extent@xmax <- 157.215737
+lcm.raster@extent@ymin <- -44.318646
+lcm.raster@extent@ymax <- -8.139869
+# (-44.318646 +8.139869)/(109.504356-157.215737)
 # change color to make the grassland stand out
 lcm.raster@legend@colortable[1:256] <- '#FFFDD0'#A9A9A9'
 lcm.raster@legend@colortable[c(20,22)] <- col.df$flower[1:2]
@@ -71,10 +71,10 @@ rc.agg <- raster::aggregate(rc,10,expand=F,fun = function(x,na.rm=FALSE){
 # convert the raster to a df
 tmp.df <- as.data.frame(rc.agg,xy=T)
 
-saveRDS(tmp.df,'croped_lcm_df.rds')
+saveRDS(tmp.df,'cache/croped_lcm_df.rds')
 
 # get the saved data.frame
-tmp.df <- readRDS('croped_lcm_df.rds')
+tmp.df <- readRDS('cache/croped_lcm_df.rds')
 
 # get the lc type needed
 tmp.df.19 <- tmp.df[tmp.df$layer == 19,]
@@ -111,20 +111,35 @@ random.select.func <- function(tmp.df,n.band = 5,num.per.band = 2){
 # samples.21 <- random.select.func(tmp.df.21,n.band = 1,num.per.band = 5)
 
 # randomly selects a few sites
-set.seed(1111)
+set.seed(1935)
 r.nm.19 <- sample.int(length(tmp.df.19$x),10)
 r.nm.21 <- sample.int(length(tmp.df.21$x),10)
 
 # get resolution
 map.res<- res(lcm.raster)
 
+# functions to convert coord to x and y
+
+coord2xy.func <- function(coord.vec,is.lat,n.dim,
+                          x.min = 109.504356,x.max = 157.215737,y.min = -44.318646,y.max = -8.139869){
+  if(is.lat == FALSE){
+    return(round((coord.vec  - x.min) / (x.max - x.min) * n.dim))
+  }else{
+    return(round((coord.vec  - y.min) / (y.max - y.min) * n.dim))
+  }
+}
+
 # find certre of sites and correct by resolution
 samples.19 <- tmp.df.19[r.nm.19,]
 samples.19$lon <- samples.19$x + map.res[1]*5
 samples.19$lat <- samples.19$y + map.res[2]*5
+samples.19$x.nm <- coord2xy.func(samples.19$x,is.lat = FALSE,n.dim=lcm.original@ncols)
+samples.19$y.nm <-  coord2xy.func(samples.19$y,is.lat = TRUE,n.dim=lcm.original@nrows)
 samples.21 <- tmp.df.21[r.nm.21,]
 samples.21$lon <- samples.21$x + map.res[1]*5
 samples.21$lat <- samples.21$y + map.res[2]*5
+samples.21$x.nm <- coord2xy.func(samples.21$x,is.lat = FALSE,n.dim=lcm.original@ncols)
+samples.21$y.nm <-  coord2xy.func(samples.21$y,is.lat = TRUE,n.dim=lcm.original@nrows)
 # save chosen sites
 write.csv(rbind(samples.19,samples.21),'chosen sites.csv',row.names = F)
 
@@ -134,13 +149,34 @@ pdf('figures/lcm with sites.pdf',width = 8,height = 0.76*8)
 # 
 
 plot(lcm.original)
+# plot choosen sites
+points(x = samples.19$x.nm,y=samples.19$y.nm,pch=0,col='red',cex=.5)
+
+points(x = samples.21$x.nm,y=samples.21$y.nm,pch=0,col='black',cex=.5)
+
+# DN sites
+points(x = coord2xy.func(c(150.73394,144.619028,146.641889,141.712600),is.lat = FALSE,n.dim=lcm.original@ncols),
+       y = coord2xy.func(-c(33.610412,26.577250,31.645194,29.607250),is.lat = T,n.dim=lcm.original@nrows),
+       pch=3,col=col.df$reptile[2],cex=1)
+# Waston sites
+watson.sites <- read.csv('watson_site.csv')
+
+points(x = coord2xy.func(watson.sites$lon,is.lat = FALSE,n.dim=lcm.original@ncols),
+       y = coord2xy.func(watson.sites$lat,is.lat = TRUE,n.dim=lcm.original@nrows),
+       pch=4,col=col.df$reptile[3],cex=1)
+
+legend(x=100,y=4600,legend = c('Tussock','Other','Chosen Tussock','Chosen other','DroughtNet','Watson'),
+       pch=c(15,15,0,0,3,4),col=c(lcm.original@legend@colortable[c(20,22)],'red','black',col.df$reptil[1:2]),bg='grey')
+
+# plot the hilighted map
+plot(lcm.raster)
 # adline grid lines
 abline(v = 110,lty='dashed',col='darkgrey')
 abline(v = 120,lty='dashed',col='darkgrey')
 abline(v = 130,lty='dashed',col='darkgrey')
 abline(v = 140,lty='dashed',col='darkgrey')
 abline(v = 150,lty='dashed',col='darkgrey')
-# 
+#
 abline(h = -10,lty='dashed',col='darkgrey')
 abline(h = -20,lty='dashed',col='darkgrey')
 abline(h = -30,lty='dashed',col='darkgrey')
@@ -155,12 +191,6 @@ points(x = c(150.73394,144.619028,146.641889,141.712600),
 # Waston sites
 watson.sites <- read.csv('watson_site.csv')
 points(x = watson.sites$lon,y=watson.sites$lat,pch=4,col=col.df$reptile[3],cex=1)
-
-legend(x=109.504356,y=-35.7,legend = c('Tussock','Other','Chosen Tussock','Chosen other','DroughtNet','Watson'),
-       pch=c(15,15,0,0,3,4),col=c(lcm.raster@legend@colortable[c(20,22)],'red','black',col.df$reptil[1:2]),bg='grey')
-
-# plot the hilighted map
-plot(lcm.raster)
 
 dev.off()
 
