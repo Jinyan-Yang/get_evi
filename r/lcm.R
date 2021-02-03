@@ -80,40 +80,40 @@ tmp.df <- readRDS('cache/croped_lcm_df.rds')
 tmp.df.19 <- tmp.df[tmp.df$layer == 19,]
 tmp.df.21 <- tmp.df[tmp.df$layer == 21,]
 
-# randomly choose points from lat bands
-set.seed(10086)
-random.select.func <- function(tmp.df,n.band = 5,num.per.band = 2){
+# # randomly choose points from lat bands
+# set.seed(10086)
+# random.select.func <- function(tmp.df,n.band = 5,num.per.band = 2){
+# 
+#   # 
+#   # n.band <- 5
+#   lon.min <- 140
+#   lon.max <- 155
+#   
+#   brks.vec <- seq(lon.min,lon.max,length.out=n.band+1)
+#   # 
+#   random.band.func <- function(df,band.min, band.max){
+#     
+#     band.df <- df[df$x >= band.min & df$x <= band.max,]
+#     
+#     return(band.df[sample(row.names(band.df),num.per.band),])
+#   }
+#   
+#   tmp.ls <- list()
+#   for (i in 2:length(brks.vec)){
+#     print(paste0(brks.vec[i-1],'--',brks.vec[i]))
+#     tmp.ls[[i-1]] <- random.band.func(tmp.df,brks.vec[i-1],brks.vec[i])
+#   }
+#   
+#   return(do.call(rbind,tmp.ls))
+# }
+# # not used for now
+# # samples.19 <- random.select.func(tmp.df.19,n.band = 5,num.per.band = 1)
+# # samples.21 <- random.select.func(tmp.df.21,n.band = 1,num.per.band = 5)
 
-  # 
-  # n.band <- 5
-  lon.min <- 140
-  lon.max <- 155
-  
-  brks.vec <- seq(lon.min,lon.max,length.out=n.band+1)
-  # 
-  random.band.func <- function(df,band.min, band.max){
-    
-    band.df <- df[df$x >= band.min & df$x <= band.max,]
-    
-    return(band.df[sample(row.names(band.df),num.per.band),])
-  }
-  
-  tmp.ls <- list()
-  for (i in 2:length(brks.vec)){
-    print(paste0(brks.vec[i-1],'--',brks.vec[i]))
-    tmp.ls[[i-1]] <- random.band.func(tmp.df,brks.vec[i-1],brks.vec[i])
-  }
-  
-  return(do.call(rbind,tmp.ls))
-}
-# not used for now
-# samples.19 <- random.select.func(tmp.df.19,n.band = 5,num.per.band = 1)
-# samples.21 <- random.select.func(tmp.df.21,n.band = 1,num.per.band = 5)
-
-# randomly selects a few sites
-set.seed(10086)
-r.nm.19 <- sample.int(length(tmp.df.19$x),10)
-r.nm.21 <- sample.int(length(tmp.df.21$x),10)
+# # randomly selects a few sites
+# set.seed(10086)
+# r.nm.19 <- sample.int(length(tmp.df.19$x),10)
+# # r.nm.21 <- sample.int(length(tmp.df.21$x),10)
 
 # get resolution
 map.res<- res(lcm.raster)
@@ -130,7 +130,13 @@ coord2xy.func <- function(coord.vec,is.lat,n.dim,
 }
 
 # find certre of sites and correct by resolution
-samples.19 <- tmp.df.19[r.nm.19,]
+if(file.exists('chosen sites.csv')){
+  samples.19 <- read.csv('chosen sites.csv')
+}else{
+  source('r/get_map.R')
+  samples.19 <- read.csv('chosen sites.csv')
+}
+# samples.19 <- tmp.df.19[r.nm.19,]
 samples.19$lon <- samples.19$x + map.res[1]*5
 samples.19$lat <- samples.19$y + map.res[2]*5
 samples.19$x.nm <- coord2xy.func(samples.19$x,is.lat = FALSE,n.dim=lcm.original@ncols)
@@ -140,33 +146,11 @@ samples.19$y.nm <-  coord2xy.func(samples.19$y,is.lat = TRUE,n.dim=lcm.original@
 # samples.21$lat <- samples.21$y + map.res[2]*5
 # samples.21$x.nm <- coord2xy.func(samples.21$x,is.lat = FALSE,n.dim=lcm.original@ncols)
 # samples.21$y.nm <-  coord2xy.func(samples.21$y,is.lat = TRUE,n.dim=lcm.original@nrows)
-# save chosen sites
-write.csv(rbind(samples.19,samples.21),'chosen sites.csv',row.names = F)
+
 
 
 #make plots
 pdf('figures/lcm with sites.pdf',width = 8,height = 1*8)
-# 
-
-plot(lcm.original,asp=1)
-# plot choosen sites
-points(x = samples.19$x.nm,y=samples.19$y.nm,pch=0,col='red',cex=.5)
-
-# points(x = samples.21$x.nm,y=samples.21$y.nm,pch=0,col='black',cex=.5)
-
-# DN sites
-points(x = coord2xy.func(c(150.73394,144.619028,146.641889,141.712600),is.lat = FALSE,n.dim=lcm.original@ncols),
-       y = coord2xy.func(-c(33.610412,26.577250,31.645194,29.607250),is.lat = T,n.dim=lcm.original@nrows),
-       pch=3,col=col.df$reptile[2],cex=1)
-# Waston sites
-watson.sites <- read.csv('watson_site.csv')
-
-points(x = coord2xy.func(watson.sites$lon,is.lat = FALSE,n.dim=lcm.original@ncols),
-       y = coord2xy.func(watson.sites$lat,is.lat = TRUE,n.dim=lcm.original@nrows),
-       pch=4,col=col.df$reptile[3],cex=1)
-
-legend(x=100,y=4500,legend = c('Tussock','Chosen Tussock','DroughtNet','Watson'),
-       pch=c(15,0,3,4),col=c(lcm.original@legend@colortable[20],'red',col.df$reptil[1:2]),bg='grey')
 
 # plot the hilighted map
 plot(lcm.raster)
@@ -183,7 +167,9 @@ abline(h = -30,lty='dashed',col='darkgrey')
 abline(h = -40,lty='dashed',col='darkgrey')
 # plot choosen sites
 # points(x = samples.21$x,y=samples.21$y,pch=0,col='black',cex=.5)
-points(x = samples.19$x,y=samples.19$y,pch=0,col='red',cex=.5)
+symbol.vec <- as.character(tussock.sample.df$map.level)
+points(x = samples.19$x,y=samples.19$y,pch=rep(paste0(0:9),each=2),col='red',cex=1)
+# points(x = samples.19$x,y=samples.19$y,pch=0,col='red',cex=.5)
 # DN sites
 points(x = c(150.73394,144.619028,146.641889,141.712600),
        y = -c(33.610412,26.577250,31.645194,29.607250),
@@ -192,6 +178,58 @@ points(x = c(150.73394,144.619028,146.641889,141.712600),
 watson.sites <- read.csv('watson_site.csv')
 points(x = watson.sites$lon,y=watson.sites$lat,pch=4,col=col.df$reptile[3],cex=1)
 legend(x=111,y=-36.5,legend = c('Tussock','Chosen Tussock','DroughtNet','Watson'),
+       pch=c(15,0,3,4),col=c(lcm.original@legend@colortable[20],'red',col.df$reptil[1:2]),bg='grey')
+
+# 
+
+# plot the hilighted map
+plot(lcm.raster)
+# adline grid lines
+abline(v = 110,lty='dashed',col='darkgrey')
+abline(v = 120,lty='dashed',col='darkgrey')
+abline(v = 130,lty='dashed',col='darkgrey')
+abline(v = 140,lty='dashed',col='darkgrey')
+abline(v = 150,lty='dashed',col='darkgrey')
+#
+abline(h = -10,lty='dashed',col='darkgrey')
+abline(h = -20,lty='dashed',col='darkgrey')
+abline(h = -30,lty='dashed',col='darkgrey')
+abline(h = -40,lty='dashed',col='darkgrey')
+# plot choosen sites
+# points(x = samples.21$x,y=samples.21$y,pch=0,col='black',cex=.5)
+symbol.vec <- as.character(tussock.sample.df.tmp$map.level)
+points(x = tussock.sample.df.tmp$x,y=tussock.sample.df.tmp$y,pch=rep(paste0(0:9),each=2),col='red',cex=1)
+# points(x = samples.19$x,y=samples.19$y,pch=0,col='red',cex=.5)
+# DN sites
+points(x = c(150.73394,144.619028,146.641889,141.712600),
+       y = -c(33.610412,26.577250,31.645194,29.607250),
+       pch=3,col=col.df$reptile[2],cex=1)
+# Waston sites
+watson.sites <- read.csv('watson_site.csv')
+points(x = watson.sites$lon,y=watson.sites$lat,pch=4,col=col.df$reptile[3],cex=1)
+legend(x=111,y=-36.5,legend = c('Tussock','Chosen Tussock','DroughtNet','Watson'),
+       pch=c(15,0,3,4),col=c(lcm.original@legend@colortable[20],'red',col.df$reptil[1:2]),bg='grey')
+
+# 
+
+plot(lcm.original,asp=1)
+# plot choosen sites
+
+points(x = samples.19$x.nm,y=samples.19$y.nm,pch=0,col='red',cex=.5)
+# points(x = samples.21$x.nm,y=samples.21$y.nm,pch=0,col='black',cex=.5)
+
+# DN sites
+points(x = coord2xy.func(c(150.73394,144.619028,146.641889,141.712600),is.lat = FALSE,n.dim=lcm.original@ncols),
+       y = coord2xy.func(-c(33.610412,26.577250,31.645194,29.607250),is.lat = T,n.dim=lcm.original@nrows),
+       pch=3,col=col.df$reptile[2],cex=1)
+# Waston sites
+watson.sites <- read.csv('watson_site.csv')
+
+points(x = coord2xy.func(watson.sites$lon,is.lat = FALSE,n.dim=lcm.original@ncols),
+       y = coord2xy.func(watson.sites$lat,is.lat = TRUE,n.dim=lcm.original@nrows),
+       pch=4,col=col.df$reptile[3],cex=1)
+
+legend(x=100,y=4500,legend = c('Tussock','Chosen Tussock','DroughtNet','Watson'),
        pch=c(15,0,3,4),col=c(lcm.original@legend@colortable[20],'red',col.df$reptil[1:2]),bg='grey')
 
 dev.off()
