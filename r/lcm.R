@@ -48,7 +48,7 @@ lcm.raster@legend@colortable[129] <- '#006994'
 
 # keep the east AU
 e <- extent(140, 158, -36, -10)
-rc <- crop(lcm.rasterc, e)
+rc <- crop(lcm.raster, e)
 
 # agre to 2km resolution
 rc.agg <- raster::aggregate(rc,10,expand=F,fun = function(x,na.rm=FALSE){
