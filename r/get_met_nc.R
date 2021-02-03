@@ -65,12 +65,15 @@ get.map.coord.func <- function(lat,lon){
   
   lat.index <- c()
   lon.index <- c()
+  map.vec <- c()
   for (i in seq_along(lat)) {
     lat.index[i] <- which.min(abs(lat.vec - lat[i]))    
     lon.index[i] <-  which.min(abs(lon.vec - lon[i])) 
+    
+    map.vec[i] <- rain.m[lon.index[i],lat.index[i]]
   }
-  return(rain.m[lon.index,lat.index])
+  return(map.vec)
 }
 
-
+get.map.coord.func(c(-30,-32),c(150,147))
 

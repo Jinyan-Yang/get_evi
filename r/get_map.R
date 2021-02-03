@@ -8,4 +8,15 @@ tmp.df.19 <- tmp.df[tmp.df$aus5_1e_mvg == 19,]
 
 # read map
 tmp.df.19$map <- get.map.coord.func(tmp.df.19$y,tmp.df.19$x)
-saveRDS(tmp.df.19,'tusock_with_map.rds')
+
+tmp.df.19 <- tmp.df.19[!is.na(tmp.df.19$map),]
+
+rain.cut <- c((0:10)*100,2000)
+
+tmp.df.19$map.level <- cut(tmp.df.19$map,breaks = rain.cut,labels = paste0('<',rain.cut[-1]))
+
+saveRDS(tmp.df.19,'cache/tusock_with_map.rds')
+
+range(tmp.df.19$map,na.rm=T)
+
+levels(tmp.df.19$map.level)
