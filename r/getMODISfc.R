@@ -1,3 +1,4 @@
+# https://lpdaac.usgs.gov/products/mcd43a4v006/
 # library(curl)####
 library(raster)
 library(ncdf4)
@@ -233,7 +234,7 @@ for (i in 1:nrow(DN.site.info.df)){
 }
 
 # get fc for cw sites ######
-watson.sites <- read.csv('watson_site.csv')
+watson.sites <- read.csv('watson_site_new.csv')
 for (i in 1:nrow(watson.sites)) {
   get.fc.coords.ns.func(year.in = c(2014,2015),
                         lat = watson.sites$lat[i],
