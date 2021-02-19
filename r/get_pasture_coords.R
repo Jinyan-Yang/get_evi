@@ -32,7 +32,6 @@ rc.agg <- raster::aggregate(rc,10,expand=F,fun = function(x,na.rm=FALSE){
   }
 })
 
-# plot(lcm.modis)
 tmp.df <- as.data.frame(rc.agg,xy=T)
 
 # get the lc type needed

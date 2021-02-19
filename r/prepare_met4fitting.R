@@ -219,8 +219,13 @@ write.csv(met.cairns.df,'cairns.met.csv',row.names = F)
 
 # get met for satellite data####
 
-modis.df <- read.csv('chosen sites.csv')
-modis.df <- modis.df[seq(1,20,by=2),]
+modis.df.tussock <- read.csv('cache/chosen sites.csv')
+modis.df.tussock <- modis.df.tussock[seq(1,20,by=2),]
+names(modis.df.tussock) <- c('x','y','veg_type','map','map.level')
+modis.df.pasture <- read.csv('cache/chosen pasture sites.csv')
+names(modis.df.pasture) <- c('x','y','veg_type','map','map.level')
+
+modis.df <- rbind(modis.df.tussock,modis.df.pasture)
 
 year.in <- 2007:2016
 
