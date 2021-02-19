@@ -1,6 +1,5 @@
 # The [Data product title] data were obtained through TERN AusCover (http://www.auscover.org.au). TERN is Australia’s land-based ecosystem observatory delivering data streams to enable environmental research and management (TERN, http://www.tern.org.au). TERN is a part of Australia’s National Collaborative Research Infrastructure Strategy (NCRIS, https://www.education.gov.au/national-collaborative-research-infrastructure-strategy-ncris).
 
-
 # library(curl)####	
 # library(raster)
 
@@ -48,11 +47,11 @@ get.met.nc.func <- function(year,met.var){
 }
 
 for (year.in in 2001:2016) {
-  # get.met.nc.func(year.in,'tmax')
+  get.met.nc.func(year.in,'tmax')
   # get.met.nc.func(year.in,'tmin')
   # get.met.nc.func(year.in,'rain')
   # get.met.nc.func(year.in,'rad')
-  get.met.nc.func(year.in,'vph15')
+  # get.met.nc.func(year.in,'vph15')
 }
 get.met.nc.func(2005,'vph15')
 get.met.nc.func(2006,'vph15')

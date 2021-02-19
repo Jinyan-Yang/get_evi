@@ -1,4 +1,5 @@
 library(ncdf4)
+library(lubridate)
 # get met for coords####
 get.met.coords.func <- function(year.in,met.nm,lat,lon){
   creat.date.func <- function(year){
@@ -8,30 +9,42 @@ get.met.coords.func <- function(year.in,met.nm,lat,lon){
   
   read.func <- function(fn){
     
-    nc_data <- nc_open(fn)
+    nc_data <- try(nc_open(fn),silent = TRUE)
     
+    if(class(nc_data) == "try-error"){
+      return(NA)
+      
+    }
     
-    met.var <- paste0(met.nm,'_day')
+    if(met.nm == "rain"){
+      met.var = 'lwe_thickness_of_precipitation_amount'
+      
+    }else{
+      met.var <- paste0(met.nm,'_day')
+    }
     
     check.messedup <- try(ncvar_get(nc_data, met.var),silent = TRUE)
     
     if(class(check.messedup) == "try-error"){
-      met.var = 'lwe_thickness_of_precipitation_amount'
-      lon.vec <- ncvar_get(nc_data, "lon")
-      lat.vec <- ncvar_get(nc_data, "lat")
-      
+      value.tar <- NA
     }else{
-      lon.vec <- ncvar_get(nc_data, "longitude")
-      lat.vec <- ncvar_get(nc_data, "latitude")
+      met <- ncvar_get(nc_data, met.var)
+      
+      if(met.nm == "rain"){
+        lon.vec <- ncvar_get(nc_data, "lon")
+        lat.vec <- ncvar_get(nc_data, "lat")
+      }else{
+        lon.vec <- ncvar_get(nc_data, "longitude")
+        lat.vec <- ncvar_get(nc_data, "latitude")
+      }
+     
+      lat.index <- which.min(abs(lat.vec - lat))    
+      lon.index <-  which.min(abs(lon.vec - lon)) 
+      
+      value.tar <- met[lon.index,lat.index,]
+      rm(met)
     }
     
-    met <- ncvar_get(nc_data, met.var)
-    
-    lat.index <- which.min(abs(lat.vec - lat))    
-    lon.index <-  which.min(abs(lon.vec - lon)) 
-    
-    value.tar <- met[lon.index,lat.index,]
-    rm(met)
     return(value.tar)
   }
   
@@ -45,13 +58,39 @@ get.met.coords.func <- function(year.in,met.nm,lat,lon){
   # out.df$doy <- yday(out.df$Date)
   out.df$lat <- lat
   out.df$lon <- lon
-  
   # 
-  see <- sapply(year.in, function(y.nm){sprintf("downloads/%s/%s.%s.%02d.nc",met.nm,met.nm,y.nm,1:12)})
+  read.met.func <- function(y.nm){
+    
+    s.date <- as.Date(sprintf('%s-1-1',y.nm))
+    e.date <- as.Date(sprintf('%s-12-1',y.nm))
+    date.vec <- seq(s.date,e.date,by='day')
+    
+    out.ls <- list()
+    
+    for (i in 1:12) {
+      fn <- sprintf("downloads/%s/%s.%s.%02d.nc",met.nm,met.nm,y.nm,i)
+      met.val <- read.func(fn)
+      
+      out.ls[[i]] <- data.frame(Date = date.vec[month(date.vec) == i],
+                                lat = lat,
+                                lon = lon,
+                                temp = met.val)
   
-  file.nm.vec <- as.vector(see)
+      
+    }
+    out.df <- do.call(rbind,out.ls)
+    
+    return(out.df)
+  }
+  # fn.vec <- sapply(year.in, function(y.nm){sprintf("downloads/%s/%s.%s.%02d.nc",met.nm,met.nm,y.nm,1:12)})
+  # 
+  # fn.vec <- as.vector(fn.vec)
+  # 
+  # out.df$temp <- unlist(unname(mapply(read.func,fn.vec)))
   
-  out.df$temp <- unlist(unname(mapply(read.func,file.nm.vec)))
+  met.ls <- lapply(year.in, read.met.func)
+  
+  out.df <- do.call(rbind,met.ls)
   
   names(out.df) <- c('Date','lat','lon',met.nm)
   
@@ -93,7 +132,6 @@ lon <- 144.619028
 met.qp.df <- met.wrap.func(year.in,lat = lat ,lon=lon)
 saveRDS(met.qp.df,'cache/met.qp20012016.rds')
 
-
 # ng
 # -31.645194, 146.641889
 year.in <- 2001:2016
@@ -109,7 +147,6 @@ lat <- -36.271964
 lon <- 146.309585
 met.dp.df <- met.wrap.func(year.in,lat = lat ,lon=lon)
 saveRDS(met.dp.df,'met.dp20012016.rds')
-
 
 # waston sites
 watson.sites <- read.csv('watson_site.csv')
@@ -170,7 +207,7 @@ save.sites.func <- function(row.watson){
 apply(watson.sites,1,save.sites.func)
 # tmp <- readRDS('cache/met.GUNN20012016.rds')
 # names(tmp)
-#######
+# ######
 year.in <- 2001:2016
 lat=-16.100000
 lon=145.466389
@@ -183,8 +220,9 @@ write.csv(met.cairns.df,'cairns.met.csv',row.names = F)
 # get met for satellite data####
 
 modis.df <- read.csv('chosen sites.csv')
+modis.df <- modis.df[seq(1,20,by=2),]
 
-year.in <- 2006:2016
+year.in <- 2007:2016
 
 tmp.ls <- list()
 
