@@ -1,5 +1,7 @@
-library(raster)
+# link
+# https://ecat.ga.gov.au/geonetwork/srv/eng/catalog.search#/metadata/83868
 
+library(raster)
 # read lcm
 dpath <- 'downloads/lcm/DLCD_v2-1_MODIS_EVI_13_20140101-20151231.tif'
 lcm.modis <-  raster(dpath,layer=1)
