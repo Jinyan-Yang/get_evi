@@ -25,7 +25,7 @@ library(raster)
 devtools::source_url("https://github.com/Jinyan-Yang/colors/blob/master/R/col.R?raw=TRUE")
 
 # read lcm
-dpath <- 'downloads/lcm/GRID_NVIS5_1_AUST_EXT_MVG/aus5_1e_mvg.ovr'
+dpath <- 'downloads/lcm/GRID_NVIS6_0_AUST_EXT_MVG/aus6_0e_mvg/z001001.adf'
 lcm.original <-  raster(dpath,layer=1)
 # change ocean color
 lcm.original@legend@colortable[129] <- '#006994'
@@ -131,10 +131,10 @@ coord2xy.func <- function(coord.vec,is.lat,n.dim,
 
 # find certre of sites and correct by resolution
 if(file.exists('chosen sites.csv')){
-  samples.19 <- read.csv('chosen sites.csv')
+  samples.19 <- read.csv('cache/chosen sites.csv')
 }else{
   source('r/get_map.R')
-  samples.19 <- read.csv('chosen sites.csv')
+  samples.19 <- read.csv('cache/chosen sites.csv')
 }
 # samples.19 <- tmp.df.19[r.nm.19,]
 samples.19$lon <- samples.19$x + map.res[1]*5
