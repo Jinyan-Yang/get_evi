@@ -1,5 +1,6 @@
 # function taken from SWISH
 # https://github.com/swish-climate-impact-assessment
+# doc in http://www.bom.gov.au/jsp/awap/
 
 ExecutableFileName7Zip <- function(){
   executableName <- "C:/Program Files/7-Zip/7z.exe"
@@ -34,16 +35,6 @@ RunProcess = function(executable, arguments)
 # need to have 7zip installed
 Decompress7Zip <- function(zipFileName, outputDirectory, delete){
   executableName <- ExecutableFileName7Zip()
-  
-  #   fileName = GetFileName(zipFileName)
-  #   fileName = PathCombine(outputDirectory, fileName)
-  
-  
-  #   if(file.exists(fileName))
-  #   {
-  #     unlink(zipFileName);
-  #   }
-  
   arguments <- paste(sep="",
                      "e ",
                      "\"", zipFileName, "\" ",
@@ -118,6 +109,15 @@ get_data<-function(variable,measure,timestep,startdate,enddate){
 
 # mdofied
 get_awap_data <- function(start, end, measure_i,fold.work){
+  #######################################################
+  # inputs:
+  # start and end are the start and end days of the met
+  # measure_i is the met varible names in the grided data
+  # fold.work is where the data should be downloaded
+  
+  # output:
+  # download, unzip, and delete the zip; only keeps the gridded met
+  ########################################################
   
   if(!dir.exists(fold.work)){dir.create(fold.work)}
   

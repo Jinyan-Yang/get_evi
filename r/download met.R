@@ -46,7 +46,7 @@ get.met.nc.func <- function(year,met.var){
   }
 }
 
-for (year.in in 2001:2016) {
+for (year.in in 2001:2017) {
   get.met.nc.func(year.in,'tmax')
   # get.met.nc.func(year.in,'tmin')
   # get.met.nc.func(year.in,'rain')
