@@ -245,3 +245,4 @@ for (i in 1:nrow(modis.df)){
   
   tmp.ls[[i]] <- tmp.df
 }
+saveRDS(tmp.ls,'tmp.file.rds')
