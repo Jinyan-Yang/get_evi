@@ -117,17 +117,18 @@ read.site.met.func <- function(met.nm,measure_i){
       
     }
     tmp.rain.df <- do.call(rbind,tmp.ls)
+    saveRDS(tmp.rain.df,out.nm)
   }else{
     tmp.rain.df <- readRDS(out.nm)
   }
  
-  saveRDS(tmp.rain.df,out.nm)
   return(tmp.rain.df)
 }
 
 
 tmp.rain.df <- read.site.met.func('precipitation','totals')
 modis.site.met.df <- merge(modis.site.info.df,tmp.rain.df)
+names(modis.site.met.df)[names(modis.site.met.df)=='met.var'] <- 'Rain'
 
 tmp.par.df <- read.site.met.func('dailyPAR','solarave')
 tmp.tmax.df <- read.site.met.func('dailyTmax','maxave')
