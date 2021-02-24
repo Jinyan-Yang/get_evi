@@ -1,3 +1,6 @@
+# these code is outdated
+# now get from awap via get_awap_met
+
 library(ncdf4)
 library(lubridate)
 # get met for coords####
