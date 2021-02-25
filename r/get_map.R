@@ -48,7 +48,7 @@ write.csv(tussock.sample.df,'cache/chosen sites.csv',row.names = F)
 
 
 # get MAP for pasture#########################################################
-if(!file.exists('cache/pasutre_with_map.rds')){
+if(!file.exists('cache/pasture_with_map.rds')){
   source('r/get_met_nc.R')
   # get the saved data.frame
   tmp.df.pasture <- readRDS('cache/croped_pasture_df.rds')
@@ -75,7 +75,7 @@ pasture.coords.df$map.level <- droplevels(pasture.coords.df$map.level)
 
 rain.level.vec <- levels(pasture.coords.df$map.level)
 for (i in seq_along(rain.level.vec)) {
-  set.seed(1935)
+  set.seed(10086)
   row.chosen <- sample(nrow(tmp.ls[[i]]),1)
   
   tmp.ls[[i]] <- tmp.ls[[i]][row.chosen,]
@@ -83,6 +83,8 @@ for (i in seq_along(rain.level.vec)) {
 }
 
 pasture.coords.df.shooen <- do.call(rbind,tmp.ls)
+pasture.coords.df.shooen$x[c(1:2,5)] <- c(143.024,143.4,151.732334)
+pasture.coords.df.shooen$y[c(1:2,5)] <- c(-34.9,-35.26349,-32.374225)
 
 # tussock.sample.df.tmp <- tussock.sample.df
 # save chosen sites
