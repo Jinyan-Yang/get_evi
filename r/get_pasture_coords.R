@@ -15,8 +15,9 @@ rc <- crop(lcm.modis, e)
 # lcm.raster@extent@xmax <- 157.215737
 # lcm.raster@extent@ymin <- -44.318646
 # lcm.raster@extent@ymax <- -8.139869
-# agre to 2km resolution
-rc.agg <- raster::aggregate(rc,10,expand=F,fun = function(x,na.rm=FALSE){
+
+# agre to 1km resolution
+rc.agg <- raster::aggregate(rc,4,expand=F,fun = function(x,na.rm=FALSE){
   i=1
   on.exit(return(i))
   
@@ -26,7 +27,7 @@ rc.agg <- raster::aggregate(rc,10,expand=F,fun = function(x,na.rm=FALSE){
     i=100
   }else{
     
-    if(check.sum >= 90){
+    if(check.sum >= 16*.9){
       i=9
     }
   }
