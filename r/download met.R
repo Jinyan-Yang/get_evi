@@ -1,5 +1,5 @@
 # The [Data product title] data were obtained through TERN AusCover (http://www.auscover.org.au). TERN is Australia’s land-based ecosystem observatory delivering data streams to enable environmental research and management (TERN, http://www.tern.org.au). TERN is a part of Australia’s National Collaborative Research Infrastructure Strategy (NCRIS, https://www.education.gov.au/national-collaborative-research-infrastructure-strategy-ncris).
-
+# https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/f6475_9317_5747_6204
 # library(curl)####	
 # library(raster)
 

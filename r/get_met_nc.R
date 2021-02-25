@@ -75,5 +75,16 @@ get.map.coord.func <- function(lat,lon){
   return(map.vec)
 }
 
-get.map.coord.func(c(-30,-32),c(150,147))
+# 
+get.map.coord.wc.func <- function(lat,lon){
+  rain.m <- readRDS('cache/wc.map.auEast.30s.rds')
+ 
+  sp <- SpatialPoints(data.frame(lon=lon,lat = lat))
+  
+  map.vec <- extract(rain.m, sp, method='bilinear')
+  
+  return(map.vec)
+}
 
+# get.map.coord.func(c(-30,-32),c(150,147))
+# get.map.coord.wc.func(lat=-20,lon=148)

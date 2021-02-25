@@ -46,7 +46,7 @@ map.wc.raster@extent@xmin <- 140
 map.wc.raster@extent@xmax <- 158
 map.wc.raster@extent@ymin <- -36
 map.wc.raster@extent@ymax <- -10
-# plot(raster(map.wc.raster))
+# plot((map.wc.raster))
 saveRDS(map.wc.raster,'cache/wc.map.auEast.30s.rds')
 
 
