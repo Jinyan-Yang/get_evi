@@ -10,14 +10,37 @@ repro.modis.fun <- function(DF){
   return(coords.repro.df)
 }
 
+aea2lonlat.fun <- function(DF,input.is.aea){
+  library(rgdal)  
+  aeacrs <-  "+proj=aea +lat_0=0 +lon_0=132 +lat_1=-18 +lat_2=-36 +x_0=0 +y_0=0 +ellps=GRS80 +units=m +no_defs"
+  
+  lonlat <- '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0' 
+  
+  if(input.is.aea==TRUE){
+    s <- SpatialPoints(DF, proj4string=CRS(aeacrs))
+    
+    coords.repro.tmp <- spTransform(s, lonlat)
+  }else{
+    s <- SpatialPoints(DF, proj4string=CRS(lonlat))
+    
+    coords.repro.tmp <- spTransform(s, aeacrs)
+  }
+  
+  coords.repro.df <- as.data.frame(coords.repro.tmp)
+  return(coords.repro.df)
+}
+
+
 coord2sinu.fun <- function(DF){
   library(rgdal)  
   
+  sincrs <- "+proj=aea +lat_0=0 +lon_0=132 +lat_1=-18 +lat_2=-36 +x_0=0 +y_0=0 +ellps=GRS80 +units=m +no_defs"
+  
+  
+  
   lonlat <- '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0' 
-  s <- SpatialPoints(DF, proj4string=CRS(lonlat))
-  sincrs <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs "
-
-  coords.repro.tmp <- spTransform(s, sincrs)
+  
+  coords.repro.tmp <- spTransform(s, lonlat)
   coords.repro.df <- as.data.frame(coords.repro.tmp)
   
   return(coords.repro.df)
