@@ -4,12 +4,12 @@ modis.ndvi.met.df <- readRDS('c:/repo/PhenoMods/cache/modis/modis.ndvi.met.rds')
 
 site.vec <- unique(modis.ndvi.met.df$Species)
 
-site.vec <- site.vec[c(4,5,6,7,8,9,10,1,2,3,11,14:20,12,13)]
+site.vec <- site.vec[c(2:8,1,9:16)]
 
 # 
-pdf('figures/modis ndvi.pdf',width = 8*2, height = 8*2*.618)
+pdf('figures/modis ndvi polygon.pdf',width = 8*2, height = 8*2*.618)
 
-par(mar=c(4,5,1,4),mfrow=c(5,2))
+par(mar=c(4,5,1,4),mfrow=c(4,2))
 
 for(i in seq_along(site.vec)){
   
