@@ -52,6 +52,24 @@ get_awap_data('2010-1-1','2020-12-31','vprph15','downloads/dailyVP15')
 
 get_awap_data('2010-1-1','2020-12-31','solarave','downloads/dailyPAR')
 
+
+
+# read in modis sites coords
+modis.df.tussock <- read.csv('cache/chosen sites.csv')
+# modis.df.tussock <- modis.df.tussock[seq(1,20,by=2),]
+names(modis.df.tussock) <- c('veg_type','x','y','map','map.level')
+modis.df.tussock <- modis.df.tussock[,c('x','y','veg_type','map','map.level')]
+modis.df.tussock$type <- 'tussock'
+
+modis.df.pasture <- read.csv('cache/chosen pasture sites.csv')
+modis.df.pasture <- modis.df.pasture[,c('x','y','DLCD_v2.1_MODIS_EVI_13_20140101.20151231','map','map.level')]
+names(modis.df.pasture) <- c('x','y','veg_type','map','map.level')
+modis.df.pasture$type <- 'pasture'
+
+modis.site.info.df <- rbind(modis.df.tussock,modis.df.pasture)
+modis.site.info.df <- modis.site.info.df[modis.site.info.df$map<1000,]
+modis.site.info.df <- modis.site.info.df[modis.site.info.df$map<900 & modis.site.info.df$veg_type=='19' | modis.site.info.df$veg_type=='9',]
+
 # get awap for coord
 get.awap.coord.func <- function(cood.df,met.nm,measure_i,sdate){
   #######################################################
@@ -74,22 +92,8 @@ get.awap.coord.func <- function(cood.df,met.nm,measure_i,sdate){
   cood.df$Date <- sdate
   return(cood.df)
 }
-
-# read in modis sites coords
-modis.df.tussock <- read.csv('cache/chosen sites.csv')
-modis.df.tussock <- modis.df.tussock[seq(1,20,by=2),]
-names(modis.df.tussock) <- c('x','y','veg_type','map','map.level')
-modis.df.tussock$type <- 'tussock'
-
-modis.df.pasture <- read.csv('cache/chosen pasture sites.csv')
-names(modis.df.pasture) <- c('x','y','veg_type','map','map.level')
-modis.df.pasture$type <- 'pasture'
-
-modis.site.info.df <- rbind(modis.df.tussock,modis.df.pasture)
-
-
 # loop through all dates
-read.site.met.func <- function(met.nm,measure_i){
+read.site.met.func <- function(met.nm,measure_i,modis.site.info.df){
   #######################################################
   # inputs:
   # met.nm is the foler name of the met variable;
@@ -125,17 +129,17 @@ read.site.met.func <- function(met.nm,measure_i){
   return(tmp.rain.df)
 }
 
-
-tmp.rain.df <- read.site.met.func('precipitation','totals')
-modis.site.met.df <- merge(modis.site.info.df,tmp.rain.df)
+# 
+tmp.rain.df <- read.site.met.func('precipitation','totals',modis.site.info.df)
+modis.site.met.df <- merge(modis.site.info.df,tmp.rain.df,by=c('x','y'),all.y=T)
 names(modis.site.met.df)[names(modis.site.met.df)=='met.var'] <- 'Rain'
 
-tmp.par.df <- read.site.met.func('dailyPAR','solarave')
-tmp.tmax.df <- read.site.met.func('dailyTmax','maxave')
-tmp.tmin.df <- read.site.met.func('dailyTmin','minave')
+tmp.par.df <- read.site.met.func('dailyPAR','solarave',modis.site.info.df)
+tmp.tmax.df <- read.site.met.func('dailyTmax','maxave',modis.site.info.df)
+tmp.tmin.df <- read.site.met.func('dailyTmin','minave',modis.site.info.df)
 
-tmp.vp09.df <- read.site.met.func('dailyVP09','vprph09')
-tmp.vp15.df <- read.site.met.func('dailyVP15','vprph15')
+tmp.vp09.df <- read.site.met.func('dailyVP09','vprph09',modis.site.info.df)
+tmp.vp15.df <- read.site.met.func('dailyVP15','vprph15',modis.site.info.df)
 
 modis.site.met.df$rad <- tmp.par.df$met.var
 modis.site.met.df$tmax <- tmp.tmax.df$met.var

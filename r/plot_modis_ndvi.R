@@ -1,11 +1,10 @@
 devtools::source_url("https://github.com/Jinyan-Yang/colors/blob/master/R/col.R?raw=TRUE")
 
-modis.ndvi.met.df <- readRDS('C:/repo/PhenoMods/cache/modis/modis.ndvi.met.rds')
+modis.ndvi.met.df <- readRDS('c:/repo/PhenoMods/cache/modis/modis.ndvi.met.rds')
 
 site.vec <- unique(modis.ndvi.met.df$Species)
 
-site.vec <- site.vec[c(4,5,6,7,8,9,10,1,2,3,11,13,14:20,12)]
-
+site.vec <- site.vec[c(4,5,6,7,8,9,10,1,2,3,11,14:20,12,13)]
 
 # 
 pdf('figures/modis ndvi.pdf',width = 8*2, height = 8*2*.618)
@@ -36,4 +35,5 @@ for(i in seq_along(site.vec)){
 }
 
 dev.off()
+
 
